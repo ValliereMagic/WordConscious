@@ -27,11 +27,10 @@ public class WordSearcherThread implements Runnable{
         for (int i = startingPoint; i <= endingPoint; i++) {
             String current = allWords.get(i);
 
-            if (current.length() <= config.getLettersPerSet()) {
-                System.out.println(current);
+            if (current.length() <= config.getLettersPerSet() && current.length() >= 3) {
                 boolean valid = true;
-                for (char c : allowedCharacters) {
-                    if (!current.contains(String.valueOf(c))) {
+                for (char c : current.toCharArray()) {
+                    if (!allowedCharacters.contains(c)) {
                         valid = false;
                     }
                 }
