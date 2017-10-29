@@ -17,7 +17,7 @@ public class Main {
             Guessables guessables = Words.getGuessables(configuration);
             System.out.println(guessables.getGuessableChars());
             System.out.println("===========================");
-        System.out.println(guessables.getGuessableWords());
+            System.out.println(guessables.getGuessableWords());
             while (true) {
                 if (guessables.getGuessableWords().size() != 0) {
                     System.out.print("Enter a word to guess, or type 'hint' to get a hint, or type 'quit' to quit: ");
