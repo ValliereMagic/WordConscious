@@ -3,23 +3,25 @@ package WordConscious.Threads;
 import WordConscious.Data.Config;
 import WordConscious.Data.WordSearcherThreadResults;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class WordSearcherThread implements Runnable{
+public class WordSearcherThread implements Runnable {
 
     private Config config;
     private int startingPoint;
     private int endingPoint;
     private List<String> allWords;
     private List<Character> allowedCharacters;
+    private WordSearcherThreadResults results;
 
-    public WordSearcherThread(int startingPoint, int endingPoint, List<String> allWords, List<Character> allowedCharacters, Config config) {
+    public WordSearcherThread(int startingPoint, int endingPoint, List<String> allWords, List<Character> allowedCharacters, Config config, WordSearcherThreadResults results) {
         this.startingPoint = startingPoint;
         this.endingPoint = endingPoint;
         this.allWords = allWords;
         this.allowedCharacters = allowedCharacters;
         this.config = config;
-
+        this.results = results;
     }
 
     @Override
@@ -29,15 +31,21 @@ public class WordSearcherThread implements Runnable{
 
             if (current.length() <= config.getLettersPerSet() && current.length() >= 3) {
                 boolean valid = true;
+
+                List<Character> currentWordRegex = new LinkedList<>();
+                currentWordRegex.addAll(allowedCharacters);
                 for (char c : current.toCharArray()) {
-                    if (!allowedCharacters.contains(c)) {
+                    if (currentWordRegex.contains(c)) {
+                        int lastIndexOfChar = currentWordRegex.lastIndexOf(c);
+                        currentWordRegex.remove(lastIndexOfChar);
+                    } else {
                         valid = false;
                     }
                 }
 
                 if (valid) {
-                    if (WordSearcherThreadResults.getResults().size() < config.getWordsPerSet()) {
-                        WordSearcherThreadResults.addResult(current);
+                    if (results.getResults().size() < config.getWordsPerSet()) {
+                        results.addResult(current);
                     } else {
                         break;
                     }
