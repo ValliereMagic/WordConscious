@@ -3,7 +3,7 @@ package WordConscious.Data;
 public class ConfigurationFileReader {
 
     private static final String[] confSet = {"number-of-words-per-set:", "number-of-letters-to-choose-from:"};
-    private static final Object[] dataSet = {0,0};
+    private static final Object[] dataSet = {0, 0};
 
     public static Config getConfig() {
 
@@ -21,6 +21,6 @@ public class ConfigurationFileReader {
                 }
             }
         }
-        return new Config((int)dataSet[0], (int)dataSet[1]);
+        return new Config((int) dataSet[0], (int) dataSet[1]);
     }
 }
