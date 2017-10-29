@@ -36,7 +36,6 @@ public class WordSearcherThread implements Runnable{
                 }
 
                 if (valid) {
-                    System.out.println(current);
                     if (WordSearcherThreadResults.getResults().size() < config.getWordsPerSet()) {
                         WordSearcherThreadResults.addResult(current);
                     } else {
