@@ -50,7 +50,7 @@ class Words {
     }
 
     private static int getThreadNumber() {
-        int[] possibleThreadValues = {1, 5};
+        int[] possibleThreadValues = {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30};
         int threadNumber = Runtime.getRuntime().availableProcessors();
         int distance = Math.abs(possibleThreadValues[0] - threadNumber);
         int idx = 0;
