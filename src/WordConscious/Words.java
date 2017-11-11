@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Words {
+class Words {
 
-    public static Guessables getGuessables(Config config) {
+    static Guessables getGuessables(Config config) {
         List<Character> guessableChars = getGuessableCharacters(config);
         List<String> guessableWords = getGuessWords(guessableChars, config);
         return new Guessables(guessableChars, guessableWords);
@@ -50,7 +50,7 @@ public class Words {
     }
 
     private static int getThreadNumber() {
-        int[] possibleThreadValues = {2, 4, 5, 8, 10, 16};
+        int[] possibleThreadValues = {1, 5};
         int threadNumber = Runtime.getRuntime().availableProcessors();
         int distance = Math.abs(possibleThreadValues[0] - threadNumber);
         int idx = 0;
