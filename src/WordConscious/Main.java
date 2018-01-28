@@ -40,7 +40,8 @@ public class Main {
                         System.out.println("Available Commands: \n" +
                                 "   hint -> get a hint on a random un-guessed word.\n" +
                                 "   quit -> quit the game.\n" +
-                                "   shuffle -> shuffle the letters.");
+                                "   shuffle -> shuffle the letters.\n" +
+                                "   howmany -> list how many words are left.");
 
                     } else if (userInput.toLowerCase().equals("quit")) {
                         quitting = true;
@@ -74,6 +75,9 @@ public class Main {
                         }
                         charsRevealed++;
                         System.out.println("hint: " + builder.toString());
+
+                    } else if (userInput.toLowerCase().equals("howmany")) {
+                        System.out.println("There are: " + guessables.getGuessableWords().size() + " words left.");
 
                     } else {
                         String cleanedInput = userInput.toLowerCase().trim();
