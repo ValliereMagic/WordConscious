@@ -4,6 +4,7 @@ package WordConscious;
 import WordConscious.Data.Config;
 import WordConscious.Data.ConfigurationFileReader;
 import WordConscious.Data.Guessables;
+import WordConscious.Data.HintData;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,15 +22,14 @@ public class Main {
 
         while (!quitting) {
             Guessables guessables = Words.getGuessables(configuration);
+            List<String> currentGuessableWords = guessables.getGuessableWords();
+            List<Character> currentGuessableChars = guessables.getGuessableChars();
 
-            if (guessables.getGuessableWords().size() != 0) {
-                int currentHintIndex = -1;
-                String currentGuessWord = "";
-                int charsRevealed = 0;
+            if (currentGuessableWords.size() != 0) {
+                HintData hData = new HintData();
 
-                System.out.println(guessables.getGuessableChars());
+                System.out.println(currentGuessableChars);
                 System.out.println("===========================");
-                //System.out.println(guessables.getGuessableWords());
                 System.out.println("Enter a word to guess, or type ? to list commands.");
 
                 while (true) {
@@ -48,52 +48,64 @@ public class Main {
                         break;
 
                     } else if (userInput.toLowerCase().equals("shuffle")) {
-                        List<Character> letters = guessables.getGuessableChars();
-                        Collections.shuffle(letters);
-                        System.out.println(letters);
+                        Collections.shuffle(currentGuessableChars);
+                        System.out.println(currentGuessableChars);
 
                     } else if (userInput.toLowerCase().equals("hint")) {
-                        int maxValue = guessables.getGuessableWords().size();
-
-                        if (currentHintIndex == -1 || currentHintIndex > (maxValue - 1) || !guessables.getGuessableWords().get(currentHintIndex).equals(currentGuessWord)) {
-                            currentHintIndex = ThreadLocalRandom.current().nextInt(0, maxValue);
-                            charsRevealed = 0;
-                        }
-
-                        String randomWord = guessables.getGuessableWords().get(currentHintIndex);
-                        currentGuessWord = randomWord;
-                        StringBuilder builder = new StringBuilder();
-
-                        int i = 0;
-                        for (char c : randomWord.toCharArray()) {
-                            if (i <= charsRevealed) {
-                                builder.append(c);
-                            } else {
-                                builder.append("*");
-                            }
-                            i++;
-                        }
-                        charsRevealed++;
-                        System.out.println("hint: " + builder.toString());
+                        hData = getHint(hData, currentGuessableWords);
+                        System.out.println(hData.getResponse());
 
                     } else if (userInput.toLowerCase().equals("howmany")) {
-                        System.out.println("There are: " + guessables.getGuessableWords().size() + " words left.");
+                        System.out.println("There are: " + currentGuessableWords.size() + " words left.");
 
                     } else {
                         String cleanedInput = userInput.toLowerCase().trim();
-                        if (guessables.getGuessableWords().contains(cleanedInput)) {
-                            guessables.getGuessableWords().remove(cleanedInput);
-                            if (guessables.getGuessableWords().size() == 0) {
+
+                        if (currentGuessableWords.contains(cleanedInput)) {
+                            currentGuessableWords.remove(cleanedInput);
+
+                            if (currentGuessableWords.size() == 0) {
                                 System.out.println("Last word found! Nice job.");
                                 break;
                             }
-                            System.out.println("Word Found! Words left: " + guessables.getGuessableWords().size());
+                            System.out.println("Word Found! Words left: " + currentGuessableWords.size());
                         }
                     }
 
                 }
             }
         }
+    }
+
+    private static HintData getHint(HintData hData, List<String> guessableWords) {
+        int maxValue = guessableWords.size();
+        int currentHintIndex = hData.getCurrentHintIndex();
+        int charsRevealed = hData.getCharsRevealed();
+        String currentGuessWord = hData.getCurrentGuessWord();
+
+        if (currentHintIndex == -1 || currentHintIndex > (maxValue - 1) || !guessableWords.get(currentHintIndex).equals(currentGuessWord)) {
+            hData.setCurrentHintIndex(currentHintIndex = ThreadLocalRandom.current().nextInt(0, maxValue));
+            charsRevealed = 0;
+        }
+
+        String randomWord = guessableWords.get(currentHintIndex);
+        hData.setCurrentGuessWord(randomWord);
+        StringBuilder builder = new StringBuilder();
+
+        int i = 0;
+        for (char c : randomWord.toCharArray()) {
+            if (i <= charsRevealed) {
+                builder.append(c);
+            } else {
+                builder.append("*");
+            }
+            i++;
+        }
+
+        hData.setCharsRevealed(charsRevealed + 1);
+        hData.setResponse("hint: " + builder.toString());
+
+        return hData;
     }
 
     private static void init() {
