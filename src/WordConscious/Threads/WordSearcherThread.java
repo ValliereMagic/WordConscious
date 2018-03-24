@@ -3,7 +3,7 @@ package WordConscious.Threads;
 import WordConscious.Data.Config;
 import WordConscious.Data.WordSearcherThreadResults;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WordSearcherThread implements Runnable {
@@ -26,13 +26,14 @@ public class WordSearcherThread implements Runnable {
 
     @Override
     public void run() {
+        List<Character> currentWordRegex = new ArrayList<>();
+
         for (int i = startingPoint; i <= endingPoint; i++) {
             String current = allWords.get(i);
 
             if (current.length() <= config.getLettersPerSet() && current.length() >= 3) {
                 boolean valid = true;
 
-                List<Character> currentWordRegex = new LinkedList<>();
                 currentWordRegex.addAll(allowedCharacters);
                 for (char c : current.toCharArray()) {
                     if (currentWordRegex.contains(c)) {
@@ -44,6 +45,11 @@ public class WordSearcherThread implements Runnable {
                 }
 
                 if (valid) {
+                    /*
+                    * TODO: Move the logic that decides how many words can be returned
+                    * in the results to the setter in WordSearcherThreadResults.
+                    */
+
                     if (results.getResults().size() < config.getWordsPerSet()) {
                         results.addResult(current);
                     } else {
@@ -51,6 +57,7 @@ public class WordSearcherThread implements Runnable {
                     }
                 }
             }
+            currentWordRegex.clear();
         }
     }
 
