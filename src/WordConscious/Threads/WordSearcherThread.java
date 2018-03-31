@@ -45,14 +45,7 @@ public class WordSearcherThread implements Runnable {
                 }
 
                 if (valid) {
-                    /*
-                    * TODO: Move the logic that decides how many words can be returned
-                    * in the results to the setter in WordSearcherThreadResults.
-                    */
-
-                    if (results.getResults().size() < config.getWordsPerSet()) {
-                        results.addResult(current);
-                    } else {
+                    if (!(results.addResult(current))) {
                         break;
                     }
                 }
