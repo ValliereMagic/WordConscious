@@ -6,9 +6,7 @@ import WordConscious.Data.ConfigurationFileReader;
 import WordConscious.Data.Guessables;
 import WordConscious.Data.HintData;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
@@ -24,52 +22,73 @@ public class Main {
             Guessables guessables = Words.getGuessables(configuration);
             List<String> currentGuessableWords = guessables.getGuessableWords();
             List<Character> currentGuessableChars = guessables.getGuessableChars();
+            List<String> currentFoundWords = new ArrayList<>();
 
             if (currentGuessableWords.size() != 0) {
                 HintData hData = new HintData();
 
-                System.out.println(currentGuessableChars);
+                System.out.println(prettyPrintCollection(currentGuessableChars));
                 System.out.println("===========================");
                 System.out.println("Enter a word to guess, or type ? to list commands.");
 
+                playing:
                 while (true) {
                     System.out.print("> ");
                     String userInput = input.nextLine();
+                    userInput = userInput.toLowerCase().trim();
 
-                    if (userInput.equals("?")) {
-                        System.out.println("Available Commands: \n" +
-                                "   hint -> get a hint on a random un-guessed word.\n" +
-                                "   quit -> quit the game.\n" +
-                                "   shuffle -> shuffle the letters.\n" +
-                                "   howmany -> list how many words are left.");
+                    switch (userInput) {
+                        case "?":
+                            System.out.println("Available Commands: \n" +
+                                    "   hint -> get a hint on a random un-guessed word.\n" +
+                                    "   found -> list the words found by the player.\n"+
+                                    "   shuffle -> shuffle the letters.\n" +
+                                    "   howmany -> list how many words are left.\n" +
+                                    "   quit -> quit the game.");
 
-                    } else if (userInput.toLowerCase().equals("quit")) {
-                        quitting = true;
-                        break;
+                            break;
 
-                    } else if (userInput.toLowerCase().equals("shuffle")) {
-                        Collections.shuffle(currentGuessableChars);
-                        System.out.println(currentGuessableChars);
+                        case "quit":
+                            quitting = true;
+                            break playing;
 
-                    } else if (userInput.toLowerCase().equals("hint")) {
-                        hData = getHint(hData, currentGuessableWords);
-                        System.out.println(hData.getResponse());
+                        case "shuffle":
+                            Collections.shuffle(currentGuessableChars);
+                            System.out.println(prettyPrintCollection(currentGuessableChars));
+                            break;
 
-                    } else if (userInput.toLowerCase().equals("howmany")) {
-                        System.out.println("There are: " + currentGuessableWords.size() + " words left.");
+                        case "hint":
+                            getHint(hData, currentGuessableWords);
+                            System.out.println(hData.getResponse());
+                            break;
 
-                    } else {
-                        String cleanedInput = userInput.toLowerCase().trim();
+                        case "howmany":
+                            System.out.println("There are: " + currentGuessableWords.size() + " words left.");
+                            break;
 
-                        if (currentGuessableWords.contains(cleanedInput)) {
-                            currentGuessableWords.remove(cleanedInput);
+                        case "found":
 
-                            if (currentGuessableWords.size() == 0) {
-                                System.out.println("Last word found! Nice job.");
-                                break;
+                            if (currentFoundWords.size() > 0) {
+                                System.out.println("You have found: " + prettyPrintCollection(currentFoundWords));
+
+                            } else {
+                                System.out.println("You haven't found any words yet!");
                             }
-                            System.out.println("Word Found! Words left: " + currentGuessableWords.size());
-                        }
+                            break;
+
+                        default:
+                            if (currentGuessableWords.contains(userInput)) {
+
+                                currentGuessableWords.remove(userInput);
+                                currentFoundWords.add(userInput);
+
+                                if (currentGuessableWords.size() == 0) {
+                                    System.out.println("Last word found! Nice job.");
+                                    break playing;
+                                }
+                                System.out.println("Word Found! Words left: " + currentGuessableWords.size());
+                            }
+                            break;
                     }
 
                 }
@@ -77,7 +96,12 @@ public class Main {
         }
     }
 
-    private static HintData getHint(HintData hData, List<String> guessableWords) {
+    private static String prettyPrintCollection(Collection collection) {
+        String s = collection.toString();
+        return s.replace("[", "").replace("]", "");
+    }
+
+    private static void getHint(HintData hData, List<String> guessableWords) {
         int maxValue = guessableWords.size();
         int currentHintIndex = hData.getCurrentHintIndex();
         int charsRevealed = hData.getCharsRevealed();
@@ -104,8 +128,6 @@ public class Main {
 
         hData.setCharsRevealed(charsRevealed + 1);
         hData.setResponse("hint: " + builder.toString());
-
-        return hData;
     }
 
     private static void init() {

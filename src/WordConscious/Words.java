@@ -16,7 +16,7 @@ class Words {
     }
 
     private static List<String> getGuessWords(List<Character> guessableCharacters, Config configuration) {
-        WordSearcherThreadResults results = new WordSearcherThreadResults();
+        WordSearcherThreadResults results = new WordSearcherThreadResults(configuration);
 
         List<String> allWords = TextFileHandler.getContentFromFile(FileConstants.locationOfWordsFile);
         List<WordSearcherThread> searcherThreads = new ArrayList<>();

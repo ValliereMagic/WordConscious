@@ -4,7 +4,6 @@ public class HintData {
     private int currentHintIndex = -1;
     private String currentGuessWord = "";
     private int charsRevealed = 0;
-
     private String response = "";
 
     public String getResponse() {
