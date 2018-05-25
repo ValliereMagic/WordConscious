@@ -8,11 +8,18 @@ import java.util.List;
 
 public class WordSearcherThread implements Runnable {
 
+    //loaded configuration file containing user word preferences
     private Config config;
+    //point in the List that the thread will begin to search for valid words
     private int startingPoint;
+    //point when the thread stops searching
     private int endingPoint;
+    //a list of all the words to be searched (by all threads)
     private List<String> allWords;
+    //the list of characters that the words we are looking for must be
+    //made up of
     private List<Character> allowedCharacters;
+    //the results instance that all threads have, and append found words to
     private WordSearcherThreadResults results;
 
     public WordSearcherThread(int startingPoint, int endingPoint, List<String> allWords, List<Character> allowedCharacters, Config config, WordSearcherThreadResults results) {
@@ -26,15 +33,23 @@ public class WordSearcherThread implements Runnable {
 
     @Override
     public void run() {
+        //characters removed from this list as they are found in the word
         List<Character> currentWordRegex = new ArrayList<>();
 
+        //look only at words between the points of the list assigned for this thread
         for (int i = startingPoint; i <= endingPoint; i++) {
             String current = allWords.get(i);
 
+            //make sure that the word meets the length requirements set out in the config
             if (current.length() <= config.getLettersPerSet() && current.length() >= 3) {
                 boolean valid = true;
 
                 currentWordRegex.addAll(allowedCharacters);
+
+                //keep removing characters from currentWordRegex as those characters are
+                //found in the current word. When it runs out of characters, or the
+                //word regex doesn't contain a character the word has, the
+                //word is determined to be invalid.
                 for (char c : current.toCharArray()) {
                     if (currentWordRegex.contains(c)) {
                         int lastIndexOfChar = currentWordRegex.lastIndexOf(c);
@@ -44,12 +59,16 @@ public class WordSearcherThread implements Runnable {
                     }
                 }
 
+                //add valid words to the shared results instance.
                 if (valid) {
                     if (!(results.addResult(current))) {
                         break;
                     }
                 }
             }
+            //make sure that the regex is empty before checking another
+            //word, as there could be characters left over from the last
+            //test
             currentWordRegex.clear();
         }
     }

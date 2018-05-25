@@ -40,33 +40,33 @@ public class Main {
                     switch (userInput) {
                         case "?":
                             System.out.println("Available Commands: \n" +
-                                    "   hint -> get a hint on a random un-guessed word.\n" +
-                                    "   found -> list the words found by the player.\n"+
-                                    "   shuffle -> shuffle the letters.\n" +
-                                    "   howmany -> list how many words are left.\n" +
-                                    "   quit -> quit the game.");
+                                    "   ht -> get a hint on a random un-guessed word.\n" +
+                                    "   f -> list the words found by the player.\n"+
+                                    "   s -> shuffle the letters.\n" +
+                                    "   hw -> list how many words are left.\n" +
+                                    "   q -> quit the game.");
 
                             break;
 
-                        case "quit":
+                        case "q":
                             quitting = true;
                             break playing;
 
-                        case "shuffle":
+                        case "s":
                             Collections.shuffle(currentGuessableChars);
                             System.out.println(prettyPrintCollection(currentGuessableChars));
                             break;
 
-                        case "hint":
+                        case "ht":
                             getHint(hData, currentGuessableWords);
                             System.out.println(hData.getResponse());
                             break;
 
-                        case "howmany":
+                        case "hw":
                             System.out.println("There are: " + currentGuessableWords.size() + " words left.");
                             break;
 
-                        case "found":
+                        case "f":
 
                             if (currentFoundWords.size() > 0) {
                                 System.out.println("You have found: " + prettyPrintCollection(currentFoundWords));

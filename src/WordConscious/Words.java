@@ -16,29 +16,29 @@ class Words {
     }
 
     private static List<String> getGuessWords(List<Character> guessableCharacters, Config configuration) {
+        //common results appended to by all WordSearcherThreads
         WordSearcherThreadResults results = new WordSearcherThreadResults(configuration);
 
         List<String> allWords = TextFileHandler.getContentFromFile(FileConstants.locationOfWordsFile);
-        List<WordSearcherThread> searcherThreads = new ArrayList<>();
         List<Thread> threads = new ArrayList<>();
 
+        //calculate optimum number of threads based on amount of available processors
         int numberOfThreads = getThreadNumber();
         int startValue = 0;
         int incrementValue = allWords.size() / numberOfThreads;
 
+        //create all the WordSearcherThread objects, create threads for each of them, and start all the threads.
         for (int i = 0; i < numberOfThreads; i++) {
-            searcherThreads.add(new WordSearcherThread(startValue, startValue + incrementValue - 1, allWords, guessableCharacters, configuration, results));
+            WordSearcherThread currentSearcher = new WordSearcherThread(startValue, startValue + incrementValue - 1, allWords, guessableCharacters, configuration, results);
+            Thread currentThread = new Thread(currentSearcher);
+
+            threads.add(currentThread);
+            currentThread.start();
+
             startValue = startValue + incrementValue;
         }
 
-        for (WordSearcherThread t : searcherThreads) {
-            threads.add(new Thread(t));
-        }
-
-        for (Thread t : threads) {
-            t.start();
-        }
-
+        //wait for the threads to complete.
         for (Thread t : threads) {
             try {
                 t.join();
