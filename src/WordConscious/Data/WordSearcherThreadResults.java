@@ -2,17 +2,18 @@ package WordConscious.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class WordSearcherThreadResults {
     private List<String> results = new ArrayList<>();
-    private Config config;
+    private int amountOfWordsPerSet;
 
-    public WordSearcherThreadResults(Config config) {
-        this.config = config;
+    public WordSearcherThreadResults(Properties properties) {
+        this.amountOfWordsPerSet = Integer.valueOf(properties.getProperty("amount_of_words_per_set", "10"));
     }
 
     public synchronized boolean addResult(String result) {
-        if (results.size() < config.getWordsPerSet()) {
+        if (results.size() < amountOfWordsPerSet) {
             results.add(result);
             return true;
         }

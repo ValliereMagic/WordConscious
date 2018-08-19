@@ -1,33 +1,46 @@
 package WordConscious.Threads;
 
-import WordConscious.Data.Config;
 import WordConscious.Data.WordSearcherThreadResults;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class WordSearcherThread implements Runnable {
 
-    //loaded configuration file containing user word preferences
-    private Config config;
+    //number of letters generated for each guessing set
+    private int numberOfLettersPerSet;
+
+    private int minimumWordLength;
+    private int maximumWordLength;
+
     //point in the List that the thread will begin to search for valid words
     private int startingPoint;
+
     //point when the thread stops searching
     private int endingPoint;
+
     //a list of all the words to be searched (by all threads)
     private List<String> allWords;
+
     //the list of characters that the words we are looking for must be
     //made up of
     private List<Character> allowedCharacters;
+
     //the results instance that all threads have, and append found words to
     private WordSearcherThreadResults results;
 
-    public WordSearcherThread(int startingPoint, int endingPoint, List<String> allWords, List<Character> allowedCharacters, Config config, WordSearcherThreadResults results) {
+    public WordSearcherThread(int startingPoint, int endingPoint, List<String> allWords,
+                              List<Character> allowedCharacters, Properties properties, int letters_per_set,
+                              WordSearcherThreadResults results) {
+
         this.startingPoint = startingPoint;
         this.endingPoint = endingPoint;
         this.allWords = allWords;
         this.allowedCharacters = allowedCharacters;
-        this.config = config;
+        this.numberOfLettersPerSet = letters_per_set;
+        this.minimumWordLength = Integer.valueOf(properties.getProperty("minimum_word_length", "3"));
+        this.maximumWordLength = Integer.valueOf(properties.getProperty("maximum_word_length", "7"));
         this.results = results;
     }
 
@@ -41,7 +54,10 @@ public class WordSearcherThread implements Runnable {
             String current = allWords.get(i);
 
             //make sure that the word meets the length requirements set out in the config
-            if (current.length() <= config.getLettersPerSet() && current.length() >= 3) {
+            if (current.length() <=  numberOfLettersPerSet &&
+                    current.length() >= minimumWordLength &&
+                    current.length() <= maximumWordLength){
+
                 boolean valid = true;
 
                 currentWordRegex.addAll(allowedCharacters);

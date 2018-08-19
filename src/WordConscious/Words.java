@@ -5,19 +5,27 @@ import WordConscious.Threads.WordSearcherThread;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 
 class Words {
+    private Properties properties;
+    private int lettersPerSet;
 
-    static Guessables getGuessables(Config config) {
-        List<Character> guessableChars = getGuessableCharacters(config);
-        List<String> guessableWords = getGuessWords(guessableChars, config);
+    Words(Properties properties) {
+        this.properties = properties;
+        this.lettersPerSet = Integer.valueOf(properties.getProperty("number_of_letters_per_set", "8"));
+    }
+
+    Guessables getGuessables() {
+        List<Character> guessableChars = getGuessableCharacters();
+        List<String> guessableWords = getGuessWords(guessableChars, properties);
         return new Guessables(guessableChars, guessableWords);
     }
 
-    private static List<String> getGuessWords(List<Character> guessableCharacters, Config configuration) {
+    private List<String> getGuessWords(List<Character> guessableCharacters, Properties properties) {
         //common results appended to by all WordSearcherThreads
-        WordSearcherThreadResults results = new WordSearcherThreadResults(configuration);
+        WordSearcherThreadResults results = new WordSearcherThreadResults(properties);
 
         List<String> allWords = TextFileHandler.getContentFromFile(FileConstants.locationOfWordsFile);
         List<Thread> threads = new ArrayList<>();
@@ -29,7 +37,10 @@ class Words {
 
         //create all the WordSearcherThread objects, create threads for each of them, and start all the threads.
         for (int i = 0; i < numberOfThreads; i++) {
-            WordSearcherThread currentSearcher = new WordSearcherThread(startValue, startValue + incrementValue - 1, allWords, guessableCharacters, configuration, results);
+            WordSearcherThread currentSearcher = new WordSearcherThread(startValue,
+                    startValue + incrementValue - 1, allWords, guessableCharacters, properties,
+                    lettersPerSet, results);
+
             Thread currentThread = new Thread(currentSearcher);
 
             threads.add(currentThread);
@@ -49,7 +60,7 @@ class Words {
         return results.getResults();
     }
 
-    private static int getThreadNumber() {
+    private int getThreadNumber() {
         int[] possibleThreadValues = {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30};
         int threadNumber = Runtime.getRuntime().availableProcessors();
         int distance = Math.abs(possibleThreadValues[0] - threadNumber);
@@ -66,16 +77,17 @@ class Words {
         return possibleThreadValues[idx];
     }
 
-    private static List<Character> getGuessableCharacters(Config configuration) {
+    private List<Character> getGuessableCharacters() {
         List<Character> guessableCharacters = new ArrayList<>();
-        char[] possibleChars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+        char[] possibleChars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
         char[] mustContainOneOf = {'a', 'e', 'i', 'o', 'u'};
 
-        for (int i = 0; i < configuration.getLettersPerSet(); ) {
+        for (int i = 0; i < lettersPerSet; ) {
             int randomInt = ThreadLocalRandom.current().nextInt(0, 26);
             guessableCharacters.add(possibleChars[randomInt]);
 
-            if (i == configuration.getLettersPerSet() - 1) {
+            if (i == lettersPerSet - 1) {
                 boolean oneExists = false;
 
                 for (char c : mustContainOneOf) {
