@@ -1,6 +1,6 @@
 package WordConscious.Data;
 
 public class FileConstants {
-    public static final String locationOfConfigFile = "./config/main.conf";
+    static final String locationOfConfigFile = "./config/main.properties";
     public static final String locationOfWordsFile = "./data/words.txt";
 }
